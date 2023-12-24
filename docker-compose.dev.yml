@@ -1,0 +1,6 @@
+version: "2"
+services:
+  3engine-api:
+    command: yarn dev -- -L
+    environment:
+      - NODE_ENV=development
