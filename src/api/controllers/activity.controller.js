@@ -1,5 +1,6 @@
 const Activity = require('../models/activity.model');
 
+const dayDuration = 10 * 24 * 60 * 60 * 1000; // last 10 days
 /**
  * Get user list
  * @public
@@ -8,20 +9,6 @@ exports.totalActivePlayersLastWeek = async (req, res, next) => {
   try {
     const date = new Date();
     const activities = await Activity.aggregate([
-      // {
-      //   $match: match,
-      // },
-      // {
-      //   $project: {
-      //     date: {
-      //       $dateFromString: {
-      //         dateString: '$lastActive',
-      //         format: '%Y-%m-%d',
-      //       },
-      //     },
-      //   },
-      // },
-
       {
         $group: {
           _id: '$playerId',
@@ -41,33 +28,10 @@ exports.totalActivePlayersLastWeek = async (req, res, next) => {
         $match: {
           $and: [
             // eslint-disable-next-line max-len
-            { latestActivity: { $lte: date, $gte: new Date(new Date().getTime() - 10 * 24 * 60 * 60 * 1000) } },
+            { latestActivity: { $lte: date, $gte: new Date(new Date().getTime() - dayDuration) } },
           ],
         },
       },
-      // {
-      //   $addFields: {
-      //     sevenDaysDate: {
-      //       $dateSubtract: { startDate: '$latestActivity', unit: 'day', amount: 7 },
-      //     },
-      //   },
-      // },
-      // {
-      //   $addFields: {
-      //     filteredArray: {
-      //       $filter: {
-      //         input: '$dateArray',
-      //         as: 'date',
-      //         cond: {
-      //           $and: [
-      //             { $gte: ['$$date', date] },
-      //             { $lte: ['$$date', '$latestActivity'] },
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
       {
         $project: {
           _id: 0,
@@ -85,20 +49,6 @@ exports.dailyActivePlayerCountLastWeek = async (req, res, next) => {
   try {
     const date = new Date();
     const activities = await Activity.aggregate([
-      // {
-      //   $match: match,
-      // },
-      // {
-      //   $project: {
-      //     date: {
-      //       $dateFromString: {
-      //         dateString: '$lastActive',
-      //         format: '%Y-%m-%d',
-      //       },
-      //     },
-      //   },
-      // },
-
       {
         $group: {
           _id: '$playerId',
@@ -118,33 +68,10 @@ exports.dailyActivePlayerCountLastWeek = async (req, res, next) => {
         $match: {
           $and: [
             // eslint-disable-next-line max-len
-            { latestActivity: { $lte: date, $gte: new Date(new Date().getTime() - 10 * 24 * 60 * 60 * 1000) } },
+            { latestActivity: { $lte: date, $gte: new Date(new Date().getTime() - dayDuration) } },
           ],
         },
       },
-      // {
-      //   $addFields: {
-      //     sevenDaysDate: {
-      //       $dateSubtract: { startDate: '$latestActivity', unit: 'day', amount: 7 },
-      //     },
-      //   },
-      // },
-      // {
-      //   $addFields: {
-      //     filteredArray: {
-      //       $filter: {
-      //         input: '$dateArray',
-      //         as: 'date',
-      //         cond: {
-      //           $and: [
-      //             { $gte: ['$$date', date] },
-      //             { $lte: ['$$date', '$latestActivity'] },
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
       {
         $project: {
           _id: 0,
@@ -181,20 +108,6 @@ exports.averageActivePlayersLastWeek = async (req, res, next) => {
   try {
     const date = new Date();
     const activities = await Activity.aggregate([
-      // {
-      //   $match: match,
-      // },
-      // {
-      //   $project: {
-      //     date: {
-      //       $dateFromString: {
-      //         dateString: '$lastActive',
-      //         format: '%Y-%m-%d',
-      //       },
-      //     },
-      //   },
-      // },
-
       {
         $group: {
           _id: '$playerId',
@@ -214,33 +127,10 @@ exports.averageActivePlayersLastWeek = async (req, res, next) => {
         $match: {
           $and: [
             // eslint-disable-next-line max-len
-            { latestActivity: { $lte: date, $gte: new Date(new Date().getTime() - 10 * 24 * 60 * 60 * 1000) } },
+            { latestActivity: { $lte: date, $gte: new Date(new Date().getTime() - dayDuration) } },
           ],
         },
       },
-      // {
-      //   $addFields: {
-      //     sevenDaysDate: {
-      //       $dateSubtract: { startDate: '$latestActivity', unit: 'day', amount: 7 },
-      //     },
-      //   },
-      // },
-      // {
-      //   $addFields: {
-      //     filteredArray: {
-      //       $filter: {
-      //         input: '$dateArray',
-      //         as: 'date',
-      //         cond: {
-      //           $and: [
-      //             { $gte: ['$$date', date] },
-      //             { $lte: ['$$date', '$latestActivity'] },
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
       {
         $project: {
           _id: 0,
@@ -274,7 +164,7 @@ exports.averageActivePlayersLastWeek = async (req, res, next) => {
         // Calculate the average active player count
         $project: {
           _id: 0,
-          averageActivePlayers: { $divide: ['$totalActivePlayerCount', 7] },
+          averageActivePlayers: { $divide: ['$totalActivePlayerCount', '$numberOfDays'] },
         },
       },
     ]);
@@ -287,100 +177,42 @@ exports.averagePlayTimeForAllPlayers = async (req, res, next) => {
   try {
     const date = new Date();
     const activities = await Activity.aggregate([
-      // {
-      //   $match: match,
-      // },
-      // {
-      //   $project: {
-      //     date: {
-      //       $dateFromString: {
-      //         dateString: '$lastActive',
-      //         format: '%Y-%m-%d',
-      //       },
-      //     },
-      //   },
-      // },
-
       {
-        $group: {
-          _id: '$playerId',
-          dateArray: {
-            $addToSet: {
-              $dateFromString: {
-                dateString: '$lastActive',
-                format: '%Y-%m-%d',
-              },
+        $addFields: {
+          date: {
+            $dateFromString: {
+              dateString: '$lastActive',
+              format: '%Y-%m-%d',
             },
           },
         },
       },
-
-      { $addFields: { latestActivity: { $max: '$dateArray' } } },
       {
         $match: {
           $and: [
-            // eslint-disable-next-line max-len
-            { latestActivity: { $lte: date, $gte: new Date(new Date().getTime() - 10 * 24 * 60 * 60 * 1000) } },
+            {
+              date: {
+                $lte: date,
+                $gte: new Date(new Date().getTime() - dayDuration),
+              },
+            },
           ],
         },
       },
-      // {
-      //   $addFields: {
-      //     sevenDaysDate: {
-      //       $dateSubtract: { startDate: '$latestActivity', unit: 'day', amount: 7 },
-      //     },
-      //   },
-      // },
-      // {
-      //   $addFields: {
-      //     filteredArray: {
-      //       $filter: {
-      //         input: '$dateArray',
-      //         as: 'date',
-      //         cond: {
-      //           $and: [
-      //             { $gte: ['$$date', date] },
-      //             { $lte: ['$$date', '$latestActivity'] },
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
       {
+        // Group by playerId and sum the dailyPlaytime, count the number of entries
+        $group: {
+          _id: '$playerId',
+          totalPlaytime: { $sum: '$dailyPlaytime' },
+          activityCounted: { $sum: 1 },
+        },
+      },
+      {
+        // Calculate the average dailyPlaytime
         $project: {
           _id: 0,
           playerId: '$_id',
-          latestActivity: '$latestActivity',
-        },
-      },
-      {
-        // Group by the formatted date string and count unique players
-        $group: {
-          _id: '$latestActivity',
-          uniquePlayers: { $addToSet: '$playerId' },
-        },
-      },
-      {
-        // Add a new field to store the count of unique players
-        $addFields: {
-          activePlayerCount: { $size: '$uniquePlayers' },
-        },
-      },
-      {
-        // Group by null to calculate an overall average, summing the activePlayerCount
-        // and counting the days to divide
-        $group: {
-          _id: null,
-          totalActivePlayerCount: { $sum: '$activePlayerCount' },
-          numberOfDays: { $sum: 1 },
-        },
-      },
-      {
-        // Calculate the average active player count
-        $project: {
-          _id: 0,
-          averageActivePlayers: { $divide: ['$totalActivePlayerCount', 7] },
+          averageDailyPlaytime: { $divide: ['$totalPlaytime', '$activityCounted'] },
         },
       },
     ]);
@@ -393,100 +225,49 @@ exports.dayWithMostInteraction = async (req, res, next) => {
   try {
     const date = new Date();
     const activities = await Activity.aggregate([
-      // {
-      //   $match: match,
-      // },
-      // {
-      //   $project: {
-      //     date: {
-      //       $dateFromString: {
-      //         dateString: '$lastActive',
-      //         format: '%Y-%m-%d',
-      //       },
-      //     },
-      //   },
-      // },
-
       {
-        $group: {
-          _id: '$playerId',
-          dateArray: {
-            $addToSet: {
-              $dateFromString: {
-                dateString: '$lastActive',
-                format: '%Y-%m-%d',
-              },
+        $addFields: {
+          date: {
+            $dateFromString: {
+              dateString: '$lastActive',
+              format: '%Y-%m-%d',
             },
           },
         },
       },
-
-      { $addFields: { latestActivity: { $max: '$dateArray' } } },
       {
         $match: {
           $and: [
-            // eslint-disable-next-line max-len
-            { latestActivity: { $lte: date, $gte: new Date(new Date().getTime() - 10 * 24 * 60 * 60 * 1000) } },
+            {
+              date: {
+                $lte: date,
+                $gte: new Date(new Date().getTime() - dayDuration),
+              },
+            },
           ],
         },
       },
-      // {
-      //   $addFields: {
-      //     sevenDaysDate: {
-      //       $dateSubtract: { startDate: '$latestActivity', unit: 'day', amount: 7 },
-      //     },
-      //   },
-      // },
-      // {
-      //   $addFields: {
-      //     filteredArray: {
-      //       $filter: {
-      //         input: '$dateArray',
-      //         as: 'date',
-      //         cond: {
-      //           $and: [
-      //             { $gte: ['$$date', date] },
-      //             { $lte: ['$$date', '$latestActivity'] },
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
       {
+        // Group by playerId and sum the dailyPlaytime, count the number of entries
+        $group: {
+          _id: '$date',
+          totalPlaytime: { $sum: '$dailyPlaytime' },
+        },
+      },
+      {
+        // Sort by interactionCount to find the day with the most interactions
+        $sort: { totalPlaytime: -1 },
+      },
+      {
+        // Limit to the first result to get the day with the most interactions
+        $limit: 1,
+      },
+      {
+        // Optionally, project the result to format it as desired
         $project: {
           _id: 0,
-          playerId: '$_id',
-          latestActivity: '$latestActivity',
-        },
-      },
-      {
-        // Group by the formatted date string and count unique players
-        $group: {
-          _id: '$latestActivity',
-          uniquePlayers: { $addToSet: '$playerId' },
-        },
-      },
-      {
-        // Add a new field to store the count of unique players
-        $addFields: {
-          activePlayerCount: { $size: '$uniquePlayers' },
-        },
-      },
-      {
-        // Group by null to calculate an overall average, summing the activePlayerCount
-        // and counting the days to divide
-        $group: {
-          _id: null,
-          totalActivePlayerCount: { $sum: '$activePlayerCount' },
-          numberOfDays: { $sum: 1 },
-        },
-      },
-      {
-        // Calculate the average active player count
-        $project: {
-          _id: 0,
-          averageActivePlayers: { $divide: ['$totalActivePlayerCount', 7] },
+          dayWithMostInteractions: '$_id',
+          totalPlaytime: 1,
         },
       },
     ]);

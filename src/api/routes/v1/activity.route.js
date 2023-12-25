@@ -13,4 +13,10 @@ router
 router
   .route('/averageActivePlayersLastWeek')
   .get(controller.averageActivePlayersLastWeek);
+router
+  .route('/averagePlayTimeForAllPlayers')
+  .get(controller.averagePlayTimeForAllPlayers);
+router
+  .route('/dayWithMostInteraction')
+  .get(controller.dayWithMostInteraction);
 module.exports = router;
