@@ -1,7 +1,7 @@
 const Activity = require('../models/activity.model');
 
-const dayDuration = 10 * 24 * 60 * 60 * 1000; // last 10 days
 const daysCount = 10;
+const dayDuration = daysCount * 24 * 60 * 60 * 1000; // last 10 days
 exports.totalActivePlayersLastWeek = async (req, res, next) => {
   try {
     const date = new Date();
